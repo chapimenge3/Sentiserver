@@ -158,3 +158,16 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+sentiserver/.aws-sam/build.toml
+sentiserver/.aws-sam/sync.toml
+sentiserver/.aws-sam/auto-dependency-layer/adl_nested_template.yaml
+sentiserver/.aws-sam/auto-dependency-layer/template.yaml
+sentiserver/.aws-sam/auto-dependency-layer/AnalyzePost/__init__.py
+sentiserver/.aws-sam/auto-dependency-layer/AnalyzePost/handler.py
+sentiserver/.aws-sam/auto-dependency-layer/AnalyzePost818b9d41DepLayer/AWS_SAM_CLI_README
+sentiserver/.aws-sam/auto-dependency-layer/FeedPost/__init__.py
+sentiserver/.aws-sam/auto-dependency-layer/FeedPost/handler.py
+sentiserver/.aws-sam/auto-dependency-layer/FeedPost4c0487ecDepLayer/AWS_SAM_CLI_README
+sentiserver/.aws-sam/auto-dependency-layer/GetSentiment/__init__.py
+sentiserver/.aws-sam/auto-dependency-layer/GetSentiment/handler.py
+sentiserver/.aws-sam/auto-dependency-layer/GetSentiment5bacf6d0DepLayer/AWS_SAM_CLI_README

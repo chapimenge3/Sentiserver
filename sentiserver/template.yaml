@@ -1,0 +1,113 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  sentiserver
+
+  Sentinel - Real-time Sentiment Analysis for Social Media Posts using AWS Serverless Stack
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+    Runtime: python3.10
+
+Resources:
+  SentiserverStream:
+    Type: AWS::Kinesis::Stream
+    Properties:
+      Name: sentiserver-stream
+      ShardCount: 1
+
+  SentiserverStreamConsumer:
+    Type: AWS::Kinesis::StreamConsumer
+    Properties:
+      ConsumerName: sentiserver-stream-consumer
+      StreamARN: !GetAtt SentiserverStream.Arn
+
+  PostTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Post
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+  AnalyzePost:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: AnalyzePost/
+      Handler: handler.lambda_handler
+      Events:
+        Stream:
+          Type: Kinesis
+          Properties:
+            Stream: !Ref SentiserverStreamConsumer
+            StartingPosition: LATEST
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PostTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PostTable
+        - 
+          Statement:
+            - Effect: Allow
+              Action:
+                - comprehend:DetectSentiment
+              Resource: "*"
+
+  FeedPost:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: FeedPost/
+      Handler: handler.lambda_handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /feed
+            Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PostTable
+        - KinesisCrudPolicy:
+            StreamName: !Ref SentiserverStream
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PostTable
+          STREAM_NAME: !Ref SentiserverStream
+
+  GetSentiment:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: GetSentiment/
+      Handler: handler.lambda_handler
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /sentiment
+            Method: get
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref PostTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref PostTable
+
+Outputs:
+  ApiURL:
+    Description: "API endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+
+  StreamName:
+    Description: "Kinesis Stream Name"
+    Value: !Ref SentiserverStream
+
+  PostTableName:
+    Description: "DynamoDB Table Name"
+    Value: !Ref PostTable
