@@ -4,6 +4,13 @@ Sentinel - Real-time Sentiment Analysis for Social Media Posts using AWS Serverl
 
 This project is for analyzing post(or any text) using AWS Comprehend.
 
+## Demo
+
+Watch the demo on Vimeo or click [here](https://vimeo.com/838475318).
+
+[newenew.webm](https://github.com/chapimenge3/Sentiserver/assets/48279189/d2c72cac-3ef2-4074-b701-f581b59f346c)
+
+
 ## Architecture
 
 ![Architecture](./architecture.svg)
