@@ -1,8 +1,9 @@
-import os
-import json
 import base64
+import json
 import logging
+import os
 from datetime import datetime
+
 import boto3
 
 logging.basicConfig(level=logging.INFO)
@@ -43,6 +44,11 @@ def update_db(post: dict):
         ":u": updated_at,
         ":ss": post["sentiment_score"],
     }
+    # below is a workaround for reserved words in DynamoDB
+    # status in this case is a reserved word. So we have to
+    # use ExpressionAttributeNames to tell DynamoDB that
+    # we are referring to the attribute name and not the
+    # reserved word
     table.update_item(
         Key={"id": post["id"]},
         UpdateExpression=update_expression,
@@ -62,7 +68,8 @@ def get_sentiment(post):
     returns:
         post (dict): Post object that was analyses
     """
-    response = comprehend.detect_sentiment(Text=post["text"], LanguageCode="en")
+    response = comprehend.detect_sentiment(
+        Text=post["text"], LanguageCode="en")
     sentiment = response["Sentiment"]
     post["sentiment"] = sentiment
     post["status"] = "processed"
